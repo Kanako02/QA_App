@@ -66,6 +66,8 @@ class QuestionDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_question_detail)
 
+        val user = FirebaseAuth.getInstance().currentUser
+
         // 渡ってきたQuestionのオブジェクトを保持する
         val extras = intent.extras
         mQuestion = extras.get("question") as Question
@@ -77,9 +79,20 @@ class QuestionDetailActivity : AppCompatActivity() {
         listView.adapter = mAdapter
         mAdapter.notifyDataSetChanged()
 
+//お気に入りボタンの表示
+        if (user == null){
+            //お気に入りボタン非表示
+
+        }else{
+            // ボタン表示
+        }
+
+
+
+
         fab.setOnClickListener {
             // ログイン済みのユーザーを取得する
-            val user = FirebaseAuth.getInstance().currentUser
+//            val user = FirebaseAuth.getInstance().currentUser
 
             if (user == null) {
                 // ログインしていなければログイン画面に遷移させる
