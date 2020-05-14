@@ -25,4 +25,13 @@
         android:layout_margin="16dp"
         android:src="@drawable/plus" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/favoritesbutton"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:text="☆お気に入り"/>
+
+
 </RelativeLayout>

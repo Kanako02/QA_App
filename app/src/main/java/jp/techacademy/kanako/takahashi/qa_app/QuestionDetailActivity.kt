@@ -1,21 +1,18 @@
 package jp.techacademy.kanako.takahashi.qa_app
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.view.View
-import android.widget.ListView
 
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_question_detail.*
-import java.util.HashMap
 
 class QuestionDetailActivity : AppCompatActivity() {
 
@@ -66,8 +63,6 @@ class QuestionDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_question_detail)
 
-        val user = FirebaseAuth.getInstance().currentUser
-
         // 渡ってきたQuestionのオブジェクトを保持する
         val extras = intent.extras
         mQuestion = extras.get("question") as Question
@@ -79,20 +74,9 @@ class QuestionDetailActivity : AppCompatActivity() {
         listView.adapter = mAdapter
         mAdapter.notifyDataSetChanged()
 
-//お気に入りボタンの表示
-        if (user == null){
-            //お気に入りボタン非表示
-
-        }else{
-            // ボタン表示
-        }
-
-
-
-
         fab.setOnClickListener {
             // ログイン済みのユーザーを取得する
-//            val user = FirebaseAuth.getInstance().currentUser
+            val user = FirebaseAuth.getInstance().currentUser
 
             if (user == null) {
                 // ログインしていなければログイン画面に遷移させる
@@ -110,4 +94,38 @@ class QuestionDetailActivity : AppCompatActivity() {
         mAnswerRef = dataBaseReference.child(ContentsPATH).child(mQuestion.genre.toString()).child(mQuestion.questionUid).child(AnswersPATH)
         mAnswerRef.addChildEventListener(mEventListener)
     }
+
+
+    override fun onResume() {
+        super.onResume()
+        val user = FirebaseAuth.getInstance().currentUser
+
+        //お気に入りボタンの表示
+        if (user == null) {
+            //お気に入りボタン非表示
+            favoritesbutton.visibility = View.GONE
+
+        } else {
+            // ボタン表示
+            favoritesbutton.visibility = View.VISIBLE;
+
+            favoritesbutton.setOnClickListener{
+                if (favoritesbutton.text == "☆お気に入り") {
+                    //表示を切り替え
+                    favoritesbutton.text = "★登録済み"
+                    favoritesbutton.setBackgroundColor(Color.YELLOW)
+                    //Fiewbaseに登録
+
+                } else if (favoritesbutton.text == "★登録済み") {
+                    //表示切り替え
+                    favoritesbutton.text = "☆お気に入り"
+                    favoritesbutton.setBackgroundColor(Color.LTGRAY)
+                    //登録削除
+                }
+            }
+
+        }
+
+    }
+
 }

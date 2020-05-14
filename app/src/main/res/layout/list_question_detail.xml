@@ -27,16 +27,8 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Small Text"
         android:id="@+id/nameTextView"
-        android:layout_alignParentBottom="true"
-       android:layout_toStartOf="@id/favoritesbutton" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/favoritesbutton"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:text="お気に入り"/>
+        android:layout_alignParentBottom="true" />
 
 
 
