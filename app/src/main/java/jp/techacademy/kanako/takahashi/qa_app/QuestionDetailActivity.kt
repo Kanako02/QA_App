@@ -7,18 +7,18 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_question_detail.*
+import kotlinx.android.synthetic.main.activity_question_send.*
+import java.util.HashMap
 
 class QuestionDetailActivity : AppCompatActivity() {
 
     private lateinit var mQuestion: Question
     private lateinit var mAdapter: QuestionDetailListAdapter
     private lateinit var mAnswerRef: DatabaseReference
+
+    private lateinit var mDataBaseReference: DatabaseReference   //追加
 
     private val mEventListener = object : ChildEventListener {
         override fun onChildAdded(dataSnapshot: DataSnapshot, s: String?) {
@@ -95,32 +95,49 @@ class QuestionDetailActivity : AppCompatActivity() {
         mAnswerRef.addChildEventListener(mEventListener)
     }
 
+/*お気に入りボタン
+* 詳細画面を開くときにFirebaseを参照
+* */
 
     override fun onResume() {
         super.onResume()
         val user = FirebaseAuth.getInstance().currentUser
+        //追加
+        val dataBaseReference = FirebaseDatabase.getInstance().reference
+        val favoritesRef =
+            dataBaseReference.child(FavoritesPATH).child(user!!.uid).child(mQuestion.questionUid)
+        val data = HashMap<String, String>()
 
         //お気に入りボタンの表示
-        if (user == null) {
+        if (user == null) {     //ログインしていない場合
             //お気に入りボタン非表示
             favoritesbutton.visibility = View.GONE
 
-        } else {
+
+        } else {                //ログインしている場合
             // ボタン表示
             favoritesbutton.visibility = View.VISIBLE;
 
-            favoritesbutton.setOnClickListener{
+            //お気に入りボタン押した時
+            favoritesbutton.setOnClickListener {
                 if (favoritesbutton.text == "☆お気に入り") {
                     //表示を切り替え
                     favoritesbutton.text = "★登録済み"
                     favoritesbutton.setBackgroundColor(Color.YELLOW)
+
                     //Fiewbaseに登録
+                    data["genre"] = mQuestion.genre.toString()
+                    favoritesRef.setValue(data)
+
+
 
                 } else if (favoritesbutton.text == "★登録済み") {
                     //表示切り替え
                     favoritesbutton.text = "☆お気に入り"
                     favoritesbutton.setBackgroundColor(Color.LTGRAY)
+
                     //登録削除
+                    favoritesRef.removeValue()
                 }
             }
 
