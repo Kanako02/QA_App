@@ -17,8 +17,7 @@ class QuestionDetailActivity : AppCompatActivity() {
     private lateinit var mQuestion: Question
     private lateinit var mAdapter: QuestionDetailListAdapter
     private lateinit var mAnswerRef: DatabaseReference
-
-    private lateinit var mDataBaseReference: DatabaseReference   //追加
+    private lateinit var mFavoritesRef: DatabaseReference  //追加
 
     private val mEventListener = object : ChildEventListener {
         override fun onChildAdded(dataSnapshot: DataSnapshot, s: String?) {
@@ -59,6 +58,34 @@ class QuestionDetailActivity : AppCompatActivity() {
         }
     }
 
+    //favoritesRefをリスナーセット
+    private val mFavoritesListener = object : ChildEventListener {
+
+    //ChildAddedはすでにデータがある場合にしか呼ばれない
+    //からこのメソッドが呼ばれたときは登録済み
+        override fun onChildAdded(dataSnapshot: DataSnapshot, s: String?) {
+            favoritesbutton.text = "★登録済み"
+            favoritesbutton.setBackgroundColor(Color.YELLOW)
+        }
+
+        override fun onChildChanged(dataSnapshot: DataSnapshot, s: String?) {
+
+        }
+
+        override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+
+        }
+
+        override fun onChildMoved(dataSnapshot: DataSnapshot, s: String?) {
+
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+
+        }
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_question_detail)
@@ -93,28 +120,29 @@ class QuestionDetailActivity : AppCompatActivity() {
         val dataBaseReference = FirebaseDatabase.getInstance().reference
         mAnswerRef = dataBaseReference.child(ContentsPATH).child(mQuestion.genre.toString()).child(mQuestion.questionUid).child(AnswersPATH)
         mAnswerRef.addChildEventListener(mEventListener)
+
     }
 
-/*お気に入りボタン
-* 詳細画面を開くときにFirebaseを参照
-* */
 
     override fun onResume() {
         super.onResume()
+
         val user = FirebaseAuth.getInstance().currentUser
-        //追加
-        val dataBaseReference = FirebaseDatabase.getInstance().reference
-        val favoritesRef =
-            dataBaseReference.child(FavoritesPATH).child(user!!.uid).child(mQuestion.questionUid)
-        val data = HashMap<String, String>()
 
         //お気に入りボタンの表示
         if (user == null) {     //ログインしていない場合
             //お気に入りボタン非表示
             favoritesbutton.visibility = View.GONE
 
+        } else {               //ログインしている場合
 
-        } else {                //ログインしている場合
+            //追加
+            val dataBaseReference = FirebaseDatabase.getInstance().reference
+            mFavoritesRef = dataBaseReference.child(FavoritesPATH).child(user!!.uid).child(mQuestion.questionUid)
+            val data = HashMap<String, String>()
+
+            mFavoritesRef.addChildEventListener(mFavoritesListener)  //追加
+
             // ボタン表示
             favoritesbutton.visibility = View.VISIBLE;
 
@@ -127,9 +155,7 @@ class QuestionDetailActivity : AppCompatActivity() {
 
                     //Fiewbaseに登録
                     data["genre"] = mQuestion.genre.toString()
-                    favoritesRef.setValue(data)
-
-
+                    mFavoritesRef.setValue(data)
 
                 } else if (favoritesbutton.text == "★登録済み") {
                     //表示切り替え
@@ -137,7 +163,7 @@ class QuestionDetailActivity : AppCompatActivity() {
                     favoritesbutton.setBackgroundColor(Color.LTGRAY)
 
                     //登録削除
-                    favoritesRef.removeValue()
+                    mFavoritesRef.removeValue()
                 }
             }
 
