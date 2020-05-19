@@ -22,7 +22,6 @@ import com.google.firebase.database.FirebaseDatabase
 import android.util.Base64  //追加する
 import android.view.View
 import android.widget.ListView
-import kotlinx.android.synthetic.main.activity_question_detail.*
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -223,8 +222,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             mToolbar.title = "コンピューター"
             mGenre = 4
         } else if (id == R.id.nav_favorites) {
-            mToolbar.title = "★お気に入り"
-            mGenre = 5
+            //お気に入り一覧画面へ遷移
+            val intent = Intent(applicationContext, FavoritesActivity::class.java)
+            startActivity(intent)
         }
 
 
