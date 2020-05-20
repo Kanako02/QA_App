@@ -34,7 +34,7 @@ class FavoritesActivity : AppCompatActivity() {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val data = snapshot.value as Map<*, *>?
 
-                    val map = dataSnapshot.value as Map<String, String>
+                    val map = snapshot.value as Map<String, String>
 
                     val title = map["title"] ?: ""
                     val body = map["body"] ?: ""
@@ -70,7 +70,7 @@ class FavoritesActivity : AppCompatActivity() {
 
                 }
 
-                override fun onCancelled(firebaseError: DatabaseError) {}
+               override fun onCancelled(firebaseError: DatabaseError) {}
             })
 
         }
@@ -106,6 +106,7 @@ class FavoritesActivity : AppCompatActivity() {
         mAdapter.notifyDataSetChanged()
 
         mListView.setOnItemClickListener { parent, view, position, id ->
+
             // Questionのインスタンスを渡して質問詳細画面を起動する
             val intent = Intent(applicationContext, QuestionDetailActivity::class.java)
             intent.putExtra("question", mQuestionArrayList[position])
@@ -118,14 +119,13 @@ class FavoritesActivity : AppCompatActivity() {
         super.onResume()
 
         val user = FirebaseAuth.getInstance().currentUser
+        // 質問のリストをクリアしてから再度Adapterにセットし、AdapterをListViewにセットし直す
         mQuestionArrayList.clear()
         mAdapter.setQuestionArrayList(mQuestionArrayList)
         mListView.adapter = mAdapter
 
         mFavoriteRef = mDatabaseReference.child(FavoritesPATH).child(user!!.uid)
         mFavoriteRef.addChildEventListener(mEventListener)
-
     }
-
 
 }
